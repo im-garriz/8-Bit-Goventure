@@ -36,9 +36,9 @@ func (o *Operand) GetOpCMD() string {
 
 	if o.Value != 0 {
 		if o.Bytes != 0 {
-			val = fmt.Sprintf("%x", o.Value) /* Hexadecimal */
+			val = fmt.Sprintf("0x%x", o.Value) /* Hexadecimal */
 		} else {
-			val = fmt.Sprintf("%d", o.Value) /* Decimal */
+			val = fmt.Sprintf("0x%d", o.Value) /* Decimal */
 		}
 	} else {
 		val = o.Name
@@ -99,7 +99,14 @@ func (d *Decoder) Read(address uint16, count uint16) (uint16, error) {
 	}
 
 	data := d.Cartridge.ROM[address : address+count]
-	return uint16(binary.LittleEndian.Uint32(data)), nil
+	//fmt.Println(d.Cartridge.ROM)
+
+	if count == 1 {
+		return uint16(data[0]), nil
+	} else {
+		return binary.LittleEndian.Uint16(data), nil
+	}
+
 }
 
 func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
@@ -117,15 +124,19 @@ func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
 			return 0, InstructionData{}, err
 		}
 		address += 1
-		instruction = d.Instructions.CBprefixed[fmt.Sprintf("%x", opcode)]
-
+		//instruction = d.Instructions.CBprefixed[fmt.Sprintf("0x%02X", opcode)]
+		//val := fmt.Sprintf("0x%02X", opcode)
+		//fmt.Println((val))
+		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
 	} else {
-		instruction = d.Instructions.Unprefixed[fmt.Sprintf("%x", opcode)]
+		//val := fmt.Sprintf("0x%02X", opcode)
+		//fmt.Println((val))
+		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
 	}
 
 	operandsList := make([]Operand, 0, len(instruction.Operands))
 
-	for i, operand := range instruction.Operands {
+	for _, operand := range instruction.Operands {
 		if operand.Bytes > 0 {
 
 			value, err := d.Read(address, uint16(operand.Bytes))
@@ -138,7 +149,7 @@ func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
 
 		}
 
-		operandsList[i] = operand
+		operandsList = append(operandsList, operand)
 	}
 
 	instruction.Operands = operandsList

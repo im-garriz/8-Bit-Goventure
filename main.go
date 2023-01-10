@@ -23,14 +23,15 @@ func main() {
 	var addr uint16
 	addr = 0x150
 
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 16; i++ {
 		address, instruction, err := decoder.Decode(addr)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
 		printableInst := instruction.GetCMD()
-		fmt.Printf("%04X %s\n", address, printableInst)
+		fmt.Printf("%04X %s\n", addr, printableInst)
 		addr = address
 	}
 
