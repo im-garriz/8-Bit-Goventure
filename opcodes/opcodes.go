@@ -1,64 +1,164 @@
 package opcodes
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/binary"
+	"errors"
 	"fmt"
 	"io/ioutil"
 )
 
-func ReadOpcodes(printOpcodes bool) (Instructions, error) {
-
-	byteValue, err := ioutil.ReadFile("opcodes/etc/opcodes.json")
-	if err != nil {
-		return Instructions{}, err
-	}
-
-	var instructions Instructions
-	json.Unmarshal(byteValue, &instructions)
-
-	if err != nil {
-		return Instructions{}, err
-	}
-
-	if printOpcodes {
-		printInstructions(instructions)
-	}
-
-	return instructions, nil
+type InstructionData struct {
+	Mnemonic  string
+	Bytes     uint8 /* Length */
+	Cycles    []uint8
+	Operands  []Operand
+	Immediate bool
+	Flags     map[string]string
 }
 
-func printInstructions(instructions Instructions) {
-	fmt.Println("Unprefixed instructions:")
-	for opcode, data := range instructions.Unprefixed {
-		fmt.Println("Opcode:", opcode)
-		fmt.Println("Mnemonic:", data.Mnemonic)
-		fmt.Println("Bytes:", data.Bytes)
-		fmt.Println("Cycles:", data.Cycles)
-		fmt.Println("Operands:")
-		for _, operand := range data.Operands {
-			fmt.Printf("- Name: %s, Bytes: %d, Immediate: %v\n", operand.Name, operand.Bytes, operand.Immediate)
-		}
-		fmt.Println("Immediate:", data.Immediate)
-		fmt.Println("Flags:", data.Flags)
-		fmt.Println()
+type Operand struct {
+	Name      string
+	Bytes     uint8 /* Length */
+	Immediate bool
+	HasValue  bool   /* Flag that indicates if operator has a value */
+	Value     uint16 /* Value of the operand */
+}
 
-		break
+type Instructions struct {
+	Unprefixed map[string]InstructionData
+	CBprefixed map[string]InstructionData
+}
+
+func (o *Operand) GetOpCMD() string {
+
+	/* Builds the Operator cmd into a string */
+
+	var buffer bytes.Buffer
+	var val string
+
+	if o.HasValue {
+		if o.Bytes != 0 {
+			val = fmt.Sprintf("0x%x", o.Value) /* Hexadecimal */
+		} else {
+			val = fmt.Sprintf("0x%d", o.Value) /* Decimal */
+		}
+	} else {
+		val = o.Name
 	}
 
-	fmt.Println("CB prefixed instructions:")
-	for opcode, data := range instructions.CBprefixed {
-		fmt.Println("Opcode:", opcode)
-		fmt.Println("Mnemonic:", data.Mnemonic)
-		fmt.Println("Bytes:", data.Bytes)
-		fmt.Println("Cycles:", data.Cycles)
-		fmt.Println("Operands:")
-		for _, operand := range data.Operands {
-			fmt.Printf("- Name: %s, Bytes: %d, Immediate: %v\n", operand.Name, operand.Bytes, operand.Immediate)
-		}
-		fmt.Println("Immediate:", data.Immediate)
-		fmt.Println("Flags:", data.Flags)
-		fmt.Println()
-
-		break
+	if o.Immediate {
+		fmt.Fprintf(&buffer, "%s", val)
+	} else {
+		fmt.Fprintf(&buffer, "(%s)", val)
 	}
+
+	return buffer.String()
+}
+
+func (i *InstructionData) GetCMD() string {
+	operands := ""
+	for i, operand := range i.Operands {
+
+		if i == 0 {
+			operands += operand.GetOpCMD()
+		} else {
+			operands += ", " + operand.GetOpCMD()
+		}
+	}
+
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "%-8s %s", i.Mnemonic, operands)
+
+	return buffer.String()
+}
+
+type GameBoyROM struct {
+	ROM []byte
+}
+
+func (gbr *GameBoyROM) LoadROM(filepath string) error {
+	rom, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+	gbr.ROM = rom
+	return nil
+}
+
+type Decoder struct {
+	Cartridge    GameBoyROM
+	Address      uint16
+	Instructions Instructions
+}
+
+func (d *Decoder) Read(address uint16, n uint8) (uint16, error) {
+
+	/* Reads n (1 or 2) bytes from address and
+	   returns the result in little endian
+	*/
+
+	if n < 1 || n > 2 {
+		return 0, errors.New(fmt.Sprintf("N must be 1 or 2, %d received", n))
+	}
+
+	// Check if tries to read out of the cartridge
+	limit := uint16(n) + address
+	if limit > uint16(len(d.Cartridge.ROM)) {
+		return 0, errors.New(fmt.Sprintf("%d + %d if out of range", address, n))
+	}
+
+	data := d.Cartridge.ROM[address:limit]
+
+	if n == 1 {
+		return uint16(data[0]), nil /* Only one byte */
+	} else {
+		return binary.LittleEndian.Uint16(data), nil /* 2 Bytes: to uint16 little endian */
+	}
+
+}
+
+func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
+	opcode, err := d.Read(address, 1)
+	if err != nil {
+		return 0, InstructionData{}, err
+	}
+
+	address += 1
+	var instruction InstructionData
+
+	if opcode == 0xCB {
+		opcode, err := d.Read(address, 1)
+		if err != nil {
+			return 0, InstructionData{}, err
+		}
+		address += 1
+		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
+	} else {
+		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
+	}
+
+	operandsList := make([]Operand, 0, len(instruction.Operands))
+
+	for _, operand := range instruction.Operands {
+
+		if operand.Bytes > 0 {
+
+			value, err := d.Read(address, operand.Bytes)
+			if err != nil {
+				return 0, InstructionData{}, err
+			}
+
+			address += uint16(operand.Bytes)
+
+			operand.HasValue = true
+			operand.Value = value
+		}
+
+		operandsList = append(operandsList, operand)
+	}
+
+	instruction.Operands = operandsList
+
+	return address, instruction, nil
 }
