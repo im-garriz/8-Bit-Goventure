@@ -1,0 +1,23 @@
+package opcodes
+
+type _Operand struct {
+	immediate bool   `json:immediate`
+	name      string `json:operands`
+	bytes     uint8  `json:operands`
+	value     int16  `json:operands`
+	adjust    string `json:operands`
+}
+
+type _InstructionData struct {
+	mnemonic  string    `json:mnemonic`
+	bytes     uint8     `json:bytes`
+	cycles    []uint8   `json:cycles`
+	operands  []Operand `json:operands`
+	immediate bool      `json:immediate`
+	flags     map[string]string
+}
+
+type _Instructions struct {
+	Unprefixed map[string]InstructionData `json:unprefixed`
+	Prefixed   map[string]InstructionData `json:cbprefixed`
+}

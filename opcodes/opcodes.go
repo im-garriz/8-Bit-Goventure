@@ -4,27 +4,61 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 )
 
-func ReadOpcodes() {
+func ReadOpcodes(printOpcodes bool) (Instructions, error) {
 
-	fileContent, _ := os.Open("etc/opcodes.json")
+	byteValue, err := ioutil.ReadFile("opcodes/etc/opcodes.json")
+	if err != nil {
+		return Instructions{}, err
+	}
 
-	/*if err != nil {
-		log.Fatal(err)
-		return a
-	}*/
+	var instructions Instructions
+	json.Unmarshal(byteValue, &instructions)
 
-	defer fileContent.Close()
+	if err != nil {
+		return Instructions{}, err
+	}
 
-	byteResult, _ := ioutil.ReadAll(fileContent)
+	if printOpcodes {
+		printInstructions(instructions)
+	}
 
-	var prefixed Prefixed
+	return instructions, nil
+}
 
-	json.Unmarshal(byteResult, &prefixed)
+func printInstructions(instructions Instructions) {
+	fmt.Println("Unprefixed instructions:")
+	for opcode, data := range instructions.Unprefixed {
+		fmt.Println("Opcode:", opcode)
+		fmt.Println("Mnemonic:", data.Mnemonic)
+		fmt.Println("Bytes:", data.Bytes)
+		fmt.Println("Cycles:", data.Cycles)
+		fmt.Println("Operands:")
+		for _, operand := range data.Operands {
+			fmt.Printf("- Name: %s, Bytes: %d, Immediate: %v\n", operand.Name, operand.Bytes, operand.Immediate)
+		}
+		fmt.Println("Immediate:", data.Immediate)
+		fmt.Println("Flags:", data.Flags)
+		fmt.Println()
 
-	for i := 0; i < len(prefixed.Instructions); i++ {
-		fmt.Println("Mnemonic: " + prefixed.Instructions[i].mnemonic)
+		break
+	}
+
+	fmt.Println("CB prefixed instructions:")
+	for opcode, data := range instructions.CBprefixed {
+		fmt.Println("Opcode:", opcode)
+		fmt.Println("Mnemonic:", data.Mnemonic)
+		fmt.Println("Bytes:", data.Bytes)
+		fmt.Println("Cycles:", data.Cycles)
+		fmt.Println("Operands:")
+		for _, operand := range data.Operands {
+			fmt.Printf("- Name: %s, Bytes: %d, Immediate: %v\n", operand.Name, operand.Bytes, operand.Immediate)
+		}
+		fmt.Println("Immediate:", data.Immediate)
+		fmt.Println("Flags:", data.Flags)
+		fmt.Println()
+
+		break
 	}
 }

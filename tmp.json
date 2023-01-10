@@ -1,0 +1,86 @@
+{
+    "unprefixed": {
+        "0x00": {
+            "mnemonic": "NOP",
+            "bytes": 1,
+            "cycles": [
+                4
+            ],
+            "operands": [],
+            "immediate": true,
+            "flags": {
+                "Z": "-",
+                "N": "-",
+                "H": "-",
+                "C": "-"
+            }
+        },
+        "0x01": {
+            "mnemonic": "LD",
+            "bytes": 3,
+            "cycles": [
+                12
+            ],
+            "operands": [
+                {
+                    "name": "BC",
+                    "immediate": true
+                },
+                {
+                    "name": "d16",
+                    "bytes": 2,
+                    "immediate": true
+                }
+            ],
+            "immediate": true,
+            "flags": {
+                "Z": "-",
+                "N": "-",
+                "H": "-",
+                "C": "-"
+            }
+        }
+    },
+    "cbprefixed": {
+        "0x00": {
+            "mnemonic": "NOP",
+            "bytes": 1,
+            "cycles": [
+                4
+            ],
+            "operands": [],
+            "immediate": true,
+            "flags": {
+                "Z": "-",
+                "N": "-",
+                "H": "-",
+                "C": "-"
+            }
+        },
+        "0x01": {
+            "mnemonic": "LD",
+            "bytes": 3,
+            "cycles": [
+                12
+            ],
+            "operands": [
+                {
+                    "name": "BC",
+                    "immediate": true
+                },
+                {
+                    "name": "d16",
+                    "bytes": 2,
+                    "immediate": true
+                }
+            ],
+            "immediate": true,
+            "flags": {
+                "Z": "-",
+                "N": "-",
+                "H": "-",
+                "C": "-"
+            }
+        }
+    }
+}
