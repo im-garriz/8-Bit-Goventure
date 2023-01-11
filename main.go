@@ -34,5 +34,4 @@ func main() {
 		fmt.Printf("%04X %s\n", addr, printableInst)
 		addr = address
 	}
-
 }

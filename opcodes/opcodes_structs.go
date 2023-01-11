@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"io/ioutil"
 )
 
 type InstructionData struct {
@@ -71,19 +70,6 @@ func (i *InstructionData) GetCMD() string {
 	fmt.Fprintf(&buffer, "%-8s %s", i.Mnemonic, operands)
 
 	return buffer.String()
-}
-
-type GameBoyROM struct {
-	ROM []byte
-}
-
-func (gbr *GameBoyROM) LoadROM(filepath string) error {
-	rom, err := ioutil.ReadFile(filepath)
-	if err != nil {
-		return err
-	}
-	gbr.ROM = rom
-	return nil
 }
 
 type Decoder struct {
