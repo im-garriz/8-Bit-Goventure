@@ -24,14 +24,15 @@ func GetCPURegisters() *CPURegisters {
 	}
 }
 
-func (c *CPURegisters) Get8bitRegister(register string) (uint8, error) {
+func (c *CPURegisters) Get8bitRegister( string) (uint8, error) {
 
 	if c.registerIsHigh(register) {
 		return getMostSignificantByte(c.values[register]), nil
 	} else if c.registerIsLow(register) {
 		return getLeastSignificantByte(c.values[register]), nil
 	} else if c.registerIsFlag(register) {
-		return c.flags[register], nil
+		flagBit = c.flags[register]
+		return c.values["AF"] >> flagBit & 1, nil
 	} else if c.registerIs16Bit(register) {
 		return 0, errors.New(fmt.Sprintf("%s register is 16 bit, not 8", register))
 	}
@@ -47,7 +48,7 @@ func (c *CPURegisters) Set8bitRegister(register string, val uint8) error {
 		return nil
 	} else if c.registerIsLow(register) {
 		v := c.values[c.lowRegisters[register]]
-		setMostSignificantByte(&v, val)
+		setLeastSignificantByte(&v, val)
 		return nil
 	} else if c.registerIsFlag(register) {
 
