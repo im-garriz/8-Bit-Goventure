@@ -35,13 +35,14 @@ func (cpu *CPU) Run() error {
 		if err != nil {
 			return err
 		}
+
 		nextAddress, instruction, err := cpu.Decoder.Decode(address)
 		if err != nil {
 			return err
 		}
-
-		cpu.Registers.Set16bitRegister("PC", nextAddress)
 		err = cpu.execute(instruction)
+		cpu.Registers.Set16bitRegister("PC", nextAddress)
+		// Cycles
 		if err != nil {
 			return err
 		}
