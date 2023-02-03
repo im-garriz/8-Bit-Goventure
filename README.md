@@ -1,2 +1,2 @@
-# PyGBoy
+# GoBoy
 Game Boy emulator
