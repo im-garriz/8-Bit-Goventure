@@ -1,4 +1,4 @@
-package opcodes
+package cartridge
 
 import (
 	"bytes"

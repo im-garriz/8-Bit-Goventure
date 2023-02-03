@@ -1,4 +1,4 @@
-package opcodes
+package cartridge
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 
 func ReadOpcodes(printOpcodes bool) (Instructions, error) {
 
-	byteValue, err := ioutil.ReadFile("opcodes/etc/opcodes.json")
+	byteValue, err := ioutil.ReadFile("cartridge/etc/opcodes.json")
 	if err != nil {
 		return Instructions{}, err
 	}

@@ -1,4 +1,4 @@
-package opcodes
+package cartridge
 
 import (
 	"bytes"
@@ -8,12 +8,14 @@ import (
 )
 
 type InstructionData struct {
-	Mnemonic  string
-	Bytes     uint8 /* Length */
-	Cycles    []uint8
-	Operands  []Operand
-	Immediate bool
-	Flags     map[string]string
+	Opcode     uint8
+	CBprefixed bool
+	Mnemonic   string
+	Bytes      uint8 /* Length */
+	Cycles     []uint8
+	Operands   []Operand
+	Immediate  bool
+	Flags      map[string]string
 }
 
 type Operand struct {
@@ -119,10 +121,14 @@ func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
 			return 0, InstructionData{}, err
 		}
 		address += 1
-		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
+		instruction = d.Instructions.CBprefixed[fmt.Sprintf("0x%02X", opcode)]
+		instruction.CBprefixed = true
 	} else {
 		instruction = d.Instructions.Unprefixed[fmt.Sprintf("0x%02X", opcode)]
+		instruction.CBprefixed = false
 	}
+
+	instruction.Opcode = uint8(opcode)
 
 	operandsList := make([]Operand, 0, len(instruction.Operands))
 
@@ -147,4 +153,22 @@ func (d *Decoder) Decode(address uint16) (uint16, InstructionData, error) {
 	instruction.Operands = operandsList
 
 	return address, instruction, nil
+}
+
+func GetDecoder(cartridgeFile string) (Decoder, error) {
+	instructions, err := ReadOpcodes(false)
+	if err != nil {
+		fmt.Println(err)
+		return Decoder{}, err
+	}
+	cartridge_ := GameBoyROM{}
+	err = cartridge_.LoadROM(cartridgeFile)
+	if err != nil {
+		fmt.Println(err)
+		return Decoder{}, err
+	}
+
+	decoder := Decoder{Cartridge: cartridge_, Address: 0, Instructions: instructions}
+
+	return decoder, nil
 }

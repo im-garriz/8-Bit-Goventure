@@ -2,23 +2,34 @@ package cpu
 
 import (
 	"fmt"
-	"main/opcodes"
+	"main/cartridge"
+
+	"github.com/golang-collections/collections/stack"
 )
 
-type InstructionError struct {
-	msg string
-}
-
-func (e *InstructionError) Error() string {
-	return e.msg
-}
-
 type CPU struct {
-	Registers CPURegisters
-	Decoder   opcodes.Decoder
+	Registers         *CPURegisters
+	Decoder           cartridge.Decoder
+	memory            GBMemory
+	InterruptsEnabled bool
+	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
 }
 
-func (cpu *CPU) execute(instruction opcodes.InstructionData) error {
+func (cpu *CPU) Init(cartridgeFile string) error {
+	cpu.Registers = GetCPURegisters()
+	cpu.Registers.Set16bitRegister("PC", 0x150)
+	dec, err := cartridge.GetDecoder(cartridgeFile)
+	if err != nil {
+		return err
+	}
+	cpu.Decoder = dec
+	cpu.memory = initCPUMemory()
+	cpu.InterruptsEnabled = false
+	cpu.Stack = *stack.New()
+	return nil
+}
+
+func (cpu *CPU) execute(instruction cartridge.InstructionData) error {
 	switch instruction.Mnemonic {
 	case "NOP":
 		//fmt.Printf("%s Succesfully executed\n", instruction.GetCMD())
@@ -40,8 +51,12 @@ func (cpu *CPU) Run() error {
 		if err != nil {
 			return err
 		}
+		PC, _ := cpu.Registers.Get16bitRegister("PC")
+		fmt.Printf("Instruction: %s PC: %x\n", instruction.GetCMD(), PC)
+
 		err = cpu.execute(instruction)
 		cpu.Registers.Set16bitRegister("PC", nextAddress)
+
 		// Cycles
 		if err != nil {
 			return err
