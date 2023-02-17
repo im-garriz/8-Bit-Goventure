@@ -1,5 +1,7 @@
 package cpu
 
+// https://rgbds.gbdev.io/docs/v0.6.1/gbz80.7/
+
 /* ADC */
 
 func (cpu *CPU) _ADC_(target *uint8, value uint8) {
@@ -174,4 +176,65 @@ func (cpu *CPU) CALL_cc_n16(addr uint16, cond string) {
 	if cpu.CCIsSatisfied(cond) {
 		cpu.CALL_n16(addr)
 	}
+}
+
+/* CFF */
+
+func (cpu *CPU) CFF(addr uint16, cond string) {
+	cpu.Registers.SetFlag("N", false)
+	cpu.Registers.SetFlag("H", false)
+	C, _ := cpu.Registers.GetFlag("C")
+	var Cbool bool
+	if C == 0 {
+		Cbool = false
+	} else {
+		Cbool = true
+	}
+	cpu.Registers.SetFlag("C", !Cbool)
+}
+
+/* CP */
+
+func (cpu *CPU) _CP_(val uint8) {
+	A, _ := cpu.Registers.Get8bitRegister("A")
+	res := A - val
+
+	cpu.Registers.SetFlag("Z", res == 0)
+	cpu.Registers.SetFlag("N", true)
+	cpu.Registers.SetFlag("H", ((A&0xF)-(val&0xF)) < 0)
+	cpu.Registers.SetFlag("C", A < val)
+}
+
+func (cpu *CPU) CP_A_r8(reg string) {
+	val, _ := cpu.Registers.Get8bitRegister(reg)
+	cpu._CP_(val)
+}
+
+func (cpu *CPU) CP_A_HL() {
+	hlPointer, _ := cpu.Registers.Get16bitRegister("HL")
+	val := cpu.ReadAddr(hlPointer)
+	cpu._CP_(val)
+}
+
+func (cpu *CPU) CP_A_n8(val uint8) {
+	cpu._CP_(val)
+}
+
+/* CPL */
+
+func (cpu *CPU) CPL(val uint8) {
+	A, _ := cpu.Registers.Get8bitRegister("A")
+	cpu.Registers.Set8bitRegister("A", ^A)
+	cpu.Registers.SetFlag("N", true)
+	cpu.Registers.SetFlag("H", true)
+}
+
+/* DAA */
+
+func (cpu *CPU) DAA(val uint8) {
+	A, _ := cpu.Registers.Get8bitRegister("A")
+
+	cpu.Registers.Set8bitRegister("A", ^A)
+	cpu.Registers.SetFlag("N", true)
+	cpu.Registers.SetFlag("H", true)
 }
