@@ -2,14 +2,14 @@ package cpu
 
 import (
 	"fmt"
-	"main/cpu/dissasembler"
+	"main/cpu/disassembler"
 
 	"github.com/golang-collections/collections/stack"
 )
 
 type CPU struct {
 	Registers         *CPURegisters
-	Dissasembler      *dissasembler.Dissasembler
+	Disassembler      *disassembler.Disassembler
 	memory            GBMemory
 	InterruptsEnabled bool
 	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
@@ -18,18 +18,18 @@ type CPU struct {
 func (cpu *CPU) Init(cartridgeFile string) error {
 	cpu.Registers = GetCPURegisters()
 	cpu.Registers.Set16bitRegister("PC", 0x150)
-	dec, err := dissasembler.GetDissassembler(cartridgeFile)
+	dec, err := disassembler.GetDissassembler(cartridgeFile)
 	if err != nil {
 		return err
 	}
-	cpu.Dissasembler = dec
+	cpu.Disassembler = dec
 	cpu.memory = initCPUMemory()
 	cpu.InterruptsEnabled = false
 	cpu.Stack = *stack.New()
 	return nil
 }
 
-func (cpu *CPU) execute(instruction dissasembler.Instruction) error {
+func (cpu *CPU) execute(instruction disassembler.Instruction) error {
 	switch instruction.Mnemonic {
 	case "NOP":
 		//fmt.Printf("%s Succesfully executed\n", instruction.GetCMD())
@@ -47,7 +47,7 @@ func (cpu *CPU) Run() error {
 			return err
 		}
 
-		nextAddress, instruction, err := cpu.Dissasembler.Decode(address)
+		nextAddress, instruction, err := cpu.Disassembler.Decode(address)
 		if err != nil {
 			return err
 		}

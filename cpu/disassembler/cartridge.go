@@ -1,5 +1,5 @@
 // Package disassembler provides functionality for disassembling GameBoy emulator ROMs.
-package dissasembler
+package disassembler
 
 import (
 	"bytes"

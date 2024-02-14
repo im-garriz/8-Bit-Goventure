@@ -1,5 +1,5 @@
 // Package disassembler provides functionality for disassembling GameBoy emulator ROMs.
-package dissasembler
+package disassembler
 
 import (
 	"encoding/binary"
@@ -8,7 +8,7 @@ import (
 )
 
 // Dissasembler represents a GameBoy ROM disassembler.
-type Dissasembler struct {
+type Disassembler struct {
 	Cartridge    *GameBoyROM   // GameBoy ROM to disassemble.
 	Address      uint16        // Current address in the disassembler.
 	Instructions *Instructions // Set of GameBoy assembly instructions.
@@ -16,7 +16,7 @@ type Dissasembler struct {
 
 // Read reads n (1 or 2) bytes from the specified address and returns the result in little endian.
 // It returns the read value and an error, if any.
-func (d *Dissasembler) Read(address uint16, n uint8) (uint16, error) {
+func (d *Disassembler) Read(address uint16, n uint8) (uint16, error) {
 
 	/* Reads n (1 or 2) bytes from address and
 	   returns the result in little endian
@@ -43,7 +43,7 @@ func (d *Dissasembler) Read(address uint16, n uint8) (uint16, error) {
 }
 
 // Decode decodes the instruction at the specified address and returns the updated address, decoded instruction, and an error, if any.
-func (d *Dissasembler) Decode(address uint16) (uint16, Instruction, error) {
+func (d *Disassembler) Decode(address uint16) (uint16, Instruction, error) {
 	opcode, err := d.Read(address, 1)
 	if err != nil {
 		return 0, Instruction{}, err
@@ -94,7 +94,7 @@ func (d *Dissasembler) Decode(address uint16) (uint16, Instruction, error) {
 
 // GetDissassembler initializes a Dissasembler for the specified GameBoy ROM file and returns a pointer to it.
 // It takes the file path of the GameBoy ROM and returns a Dissasembler and an error, if any.
-func GetDissassembler(cartridgeFile string) (*Dissasembler, error) {
+func GetDissassembler(cartridgeFile string) (*Disassembler, error) {
 	instructions, err := GetAssemblyInstructions(false)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func GetDissassembler(cartridgeFile string) (*Dissasembler, error) {
 		return nil, err
 	}
 
-	dissasembler := Dissasembler{Cartridge: gameBoyRom, Address: 0, Instructions: instructions}
+	dissasembler := Disassembler{Cartridge: gameBoyRom, Address: 0, Instructions: instructions}
 
 	return &dissasembler, nil
 }
