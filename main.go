@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"main/cpu"
+	cpu "main/z80_cpu"
 )
 
 func main() {

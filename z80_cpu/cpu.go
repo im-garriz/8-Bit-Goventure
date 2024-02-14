@@ -2,7 +2,7 @@ package cpu
 
 import (
 	"fmt"
-	"main/cpu/disassembler"
+	"main/z80_cpu/disassembler"
 
 	"github.com/golang-collections/collections/stack"
 )
