@@ -49,11 +49,11 @@ func (cpu *CPU) ReadAddr(addr uint16) uint8 {
 	case addr <= 0xFF: // TODO boot_room_active()
 		return cpu.memory.BIOS[addr]
 	case addr <= 0x7FFF:
-		return cpu.Decoder.Cartridge.ROM[addr]
+		return cpu.Dissasembler.Cartridge.ROM[addr]
 	case addr <= 0x9FFF:
 		return cpu.memory.VRAM[addr-0x8000]
 	case addr <= 0xBFFF:
-		return cpu.Decoder.Cartridge.ROM[addr] // TODO check length of cartridge
+		return cpu.Dissasembler.Cartridge.ROM[addr] // TODO check length of cartridge
 	case addr <= 0xDFFF:
 		return cpu.memory.WRAM[addr-0xC000]
 	case addr <= 0xFDFF:
@@ -80,13 +80,13 @@ func (cpu *CPU) ReadAddr(addr uint16) uint8 {
 func (cpu *CPU) WriteAddr(addr uint16, val uint8) {
 	switch {
 	case addr <= 0x7FFF:
-		cpu.Decoder.Cartridge.ROM[addr] = val
+		cpu.Dissasembler.Cartridge.ROM[addr] = val
 		return
 	case addr <= 0x9FFF:
 		cpu.memory.VRAM[addr-0x8000] = val
 		return
 	case addr <= 0xBFFF:
-		cpu.Decoder.Cartridge.ROM[addr] = val // TODO check length of cartridge
+		cpu.Dissasembler.Cartridge.ROM[addr] = val // TODO check length of cartridge
 		return
 	case addr <= 0xDFFF:
 		cpu.memory.WRAM[addr-0xC000] = val
