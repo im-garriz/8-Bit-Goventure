@@ -3,7 +3,6 @@ package disassembler
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 )
 
@@ -23,13 +22,13 @@ func (d *Disassembler) Read(address uint16, n uint8) (uint16, error) {
 	*/
 
 	if n < 1 || n > 2 {
-		return 0, errors.New(fmt.Sprintf("N must be 1 or 2, %d received", n))
+		return 0, fmt.Errorf("n must be 1 or 2, %d received", n)
 	}
 
 	// Check if tries to read out of the cartridge
 	limit := uint16(n) + address
 	if limit > uint16(len(d.Cartridge.ROM)) {
-		return 0, errors.New(fmt.Sprintf("%d + %d if out of range", address, n))
+		return 0, fmt.Errorf("%d + %d if out of range", address, n)
 	}
 
 	data := d.Cartridge.ROM[address:limit]
@@ -95,7 +94,7 @@ func (d *Disassembler) Decode(address uint16) (uint16, Instruction, error) {
 // GetDissassembler initializes a Dissasembler for the specified GameBoy ROM file and returns a pointer to it.
 // It takes the file path of the GameBoy ROM and returns a Dissasembler and an error, if any.
 func GetDissassembler(cartridgeFile string) (*Disassembler, error) {
-	instructions, err := GetAssemblyInstructions(false)
+	instructions, err := GetAssemblyInstructions()
 	if err != nil {
 		return nil, err
 	}

@@ -113,5 +113,4 @@ func (cpu *CPU) WriteAddr(addr uint16, val uint8) {
 	}
 
 	fmt.Printf("Attemting to write into unmapped memory address 0x%x\n", addr)
-	return
 }

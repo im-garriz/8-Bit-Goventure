@@ -17,7 +17,7 @@ type CPU struct {
 
 func GetCPU(cartridgeFile string) (CPU, error) {
 	cpu := CPU{}
-	err := cpu.Init("etc/snake.gb")
+	err := cpu.Init(cartridgeFile)
 
 	return cpu, err
 }

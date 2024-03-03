@@ -4,7 +4,6 @@ package disassembler
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"os"
 )
 
@@ -50,10 +49,10 @@ func LoadROM(filepath string) (*GameBoyROM, error) {
 	gbr.Header = ROMHeader{}
 	binary.Read(bytes.NewReader(rom[0x100:]), binary.LittleEndian, &gbr.Header)
 
-	// Print some information for testing purposes.
-	fmt.Printf("Title: %s\n", gbr.Header.Title)
-	fmt.Printf("Header Checksum: %d\n", gbr.Header.HeaderChecksum)
-	fmt.Printf("Global Checksum: %d\n", binary.LittleEndian.Uint16(gbr.Header.GlobalChecksum[:]))
+	// // Print some information for testing purposes.
+	// fmt.Printf("Title: %s\n", gbr.Header.Title)
+	// fmt.Printf("Header Checksum: %d\n", gbr.Header.HeaderChecksum)
+	// fmt.Printf("Global Checksum: %d\n", binary.LittleEndian.Uint16(gbr.Header.GlobalChecksum[:]))
 
 	return &gbr, nil
 }
