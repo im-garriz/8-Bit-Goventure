@@ -7,11 +7,13 @@ import (
 
 func main() {
 
-	cpu := cpu.CPU{}
-	cpu.Init("etc/snake.gb")
-	err := cpu.Run()
+	cpu, err := cpu.GetCPU("etc/snake.gb")
 	if err != nil {
-		fmt.Printf("[E]: %s\n", err)
+		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
+	}
+	err = cpu.Run()
+	if err != nil {
+		fmt.Printf("Error in cpu.Run:\n[E]: %s\n", err)
 	}
 }
 

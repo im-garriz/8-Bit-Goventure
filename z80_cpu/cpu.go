@@ -15,6 +15,13 @@ type CPU struct {
 	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
 }
 
+func GetCPU(cartridgeFile string) (CPU, error) {
+	cpu := CPU{}
+	err := cpu.Init("etc/snake.gb")
+
+	return cpu, err
+}
+
 func (cpu *CPU) Init(cartridgeFile string) error {
 	cpu.Registers = GetCPURegisters()
 	cpu.Registers.Set16bitRegister("PC", 0x150)
