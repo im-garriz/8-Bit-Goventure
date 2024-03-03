@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	cpu "main/z80_cpu"
+	"main/z80_cpu"
 )
 
 func main() {
 
-	cpu, err := cpu.GetCPU("etc/snake.gb")
+	z80_cpu, err := z80_cpu.GetCPU("etc/snake.gb")
 	if err != nil {
 		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
 	}
-	err = cpu.Run()
+	err = z80_cpu.Run()
 	if err != nil {
 		fmt.Printf("Error in cpu.Run:\n[E]: %s\n", err)
 	}

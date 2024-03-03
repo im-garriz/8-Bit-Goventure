@@ -1,4 +1,4 @@
-package cpu
+package z80_cpu
 
 // https://rgbds.gbdev.io/docs/v0.6.1/gbz80.7/
 
