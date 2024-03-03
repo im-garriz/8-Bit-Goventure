@@ -3,6 +3,7 @@ package z80_cpu
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type CPURegisters struct {
@@ -63,6 +64,8 @@ func (c *CPURegisters) Set8bitRegister(register string, val uint8) error {
 
 func (c *CPURegisters) GetFlag(flag string) (uint8, error) {
 
+	flag = strings.ToLower(flag)
+
 	if c.registerIsFlag(flag) {
 		flagBit := c.flags[flag]
 		/* c.values["AF"] >> flagBit (4): shifts to right until flagBit (4) bit is the last
@@ -76,6 +79,8 @@ func (c *CPURegisters) GetFlag(flag string) (uint8, error) {
 }
 
 func (c *CPURegisters) SetFlag(flag string, value bool) error {
+
+	flag = strings.ToLower(flag)
 
 	if c.registerIsFlag(flag) {
 

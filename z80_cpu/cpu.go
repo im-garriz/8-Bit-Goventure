@@ -15,17 +15,17 @@ type CPU struct {
 	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
 }
 
-func GetCPU(cartridgeFile string) (CPU, error) {
+func GetCPU(cartridgeFile string, opcodesJSONFile string) (CPU, error) {
 	cpu := CPU{}
-	err := cpu.Init(cartridgeFile)
+	err := cpu.Init(cartridgeFile, opcodesJSONFile)
 
 	return cpu, err
 }
 
-func (cpu *CPU) Init(cartridgeFile string) error {
+func (cpu *CPU) Init(cartridgeFile string, opcodesJSONFile string) error {
 	cpu.Registers = GetCPURegisters()
 	cpu.Registers.Set16bitRegister("PC", 0x150)
-	dec, err := disassembler.GetDissassembler(cartridgeFile)
+	dec, err := disassembler.GetDissassembler(cartridgeFile, opcodesJSONFile)
 	if err != nil {
 		return err
 	}

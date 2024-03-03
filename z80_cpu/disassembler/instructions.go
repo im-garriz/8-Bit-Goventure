@@ -77,9 +77,9 @@ func (i *Instruction) GetCMD() string {
 	return buffer.String()
 }
 
-func GetAssemblyInstructions() (*Instructions, error) {
+func GetAssemblyInstructions(opcodesJSONFile string) (*Instructions, error) {
 
-	byteValue, err := os.ReadFile("etc/opcodes.json")
+	byteValue, err := os.ReadFile(opcodesJSONFile)
 	if err != nil {
 		return nil, err
 	}

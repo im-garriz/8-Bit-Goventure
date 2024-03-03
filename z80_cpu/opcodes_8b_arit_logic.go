@@ -45,7 +45,7 @@ func (cpu *CPU) _ADD_(target *uint8, value uint8) {
 	result := uint16(*target) + uint16(value)
 
 	cpu.Registers.SetFlag("C", result > 0xFF)
-	cpu.Registers.SetFlag("H", ((*target&0x0F)+(value&0x0F)) > 0x0F) // TODO: change to result > 0xF?
+	cpu.Registers.SetFlag("H", ((*target&0x0F)+(value&0x0F)) > 0x0F)
 	cpu.Registers.SetFlag("Z", (result&0xFF) == 0)
 	cpu.Registers.SetFlag("N", false)
 
@@ -104,31 +104,35 @@ func (cpu *CPU) AND_A_n8(value uint8) {
 	cpu._AND_(&A, value)
 }
 
-/* CP A */
+/* CP */
 
-func (cpu *CPU) _CP_A_(val uint8) {
-	A, _ := cpu.Registers.Get8bitRegister("A")
-	res := A - val
+func (cpu *CPU) _CP_(target *uint8, value uint8) {
+
+	res := *target - value
 
 	cpu.Registers.SetFlag("Z", res == 0)
 	cpu.Registers.SetFlag("N", true)
-	cpu.Registers.SetFlag("H", ((A&0xF)-(val&0xF)) < 0)
-	cpu.Registers.SetFlag("C", A < val)
+	cpu.Registers.SetFlag("H", *target&0xF < value&0xF)
+	cpu.Registers.SetFlag("C", *target < value)
 }
 
 func (cpu *CPU) CP_A_r8(reg string) {
+	A, _ := cpu.Registers.Get8bitRegister("A")
 	val, _ := cpu.Registers.Get8bitRegister(reg)
-	cpu._CP_A_(val)
+
+	cpu._CP_(&A, val)
 }
 
 func (cpu *CPU) CP_A_HL() {
+	A, _ := cpu.Registers.Get8bitRegister("A")
 	hlPointer, _ := cpu.Registers.Get16bitRegister("HL")
 	val := cpu.ReadAddr(hlPointer)
-	cpu._CP_A_(val)
+	cpu._CP_(&A, val)
 }
 
 func (cpu *CPU) CP_A_n8(val uint8) {
-	cpu._CP_A_(val)
+	A, _ := cpu.Registers.Get8bitRegister("A")
+	cpu._CP_(&A, val)
 }
 
 /* DEC */
@@ -157,12 +161,13 @@ func (cpu *CPU) DEC_HL() {
 
 func (cpu *CPU) _INC_(target *uint8) {
 
+	cpu.Registers.SetFlag("H", (*target&0x0F+0x01) > 0x0F)
+
 	*target++
 
 	cpu.Registers.SetFlag("Z", *target == 0)
 	cpu.Registers.SetFlag("N", false)
-	// cpu.Registers.SetFlag("H", (*target > 0xF)) // TODO check
-	cpu.Registers.SetFlag("H", (*target&0x0F) == 0x00) // TODO check
+
 }
 
 func (cpu *CPU) INC_r8(reg string) {

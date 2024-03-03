@@ -93,8 +93,8 @@ func (d *Disassembler) Decode(address uint16) (uint16, Instruction, error) {
 
 // GetDissassembler initializes a Dissasembler for the specified GameBoy ROM file and returns a pointer to it.
 // It takes the file path of the GameBoy ROM and returns a Dissasembler and an error, if any.
-func GetDissassembler(cartridgeFile string) (*Disassembler, error) {
-	instructions, err := GetAssemblyInstructions()
+func GetDissassembler(cartridgeFile string, opcodesJSONFile string) (*Disassembler, error) {
+	instructions, err := GetAssemblyInstructions(opcodesJSONFile)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	z80_cpu, err := z80_cpu.GetCPU("etc/snake.gb")
+	z80_cpu, err := z80_cpu.GetCPU("etc/snake.gb", "etc/opcodes.json")
 	if err != nil {
 		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
 	}
