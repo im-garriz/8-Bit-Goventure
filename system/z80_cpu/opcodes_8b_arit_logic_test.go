@@ -202,3 +202,15 @@ func TestALL(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkXOR(b *testing.B) {
+
+	cpu, _ := GetCPU("../etc/snake.gb", "../etc/opcodes.json")
+
+	target := uint8(5)
+	value := uint8(25)
+
+	for i := 0; i < b.N; i++ {
+		cpu._XOR_(&target, value)
+	}
+}

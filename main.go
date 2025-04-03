@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"main/z80_cpu"
+	"main/system/z80_cpu"
 )
 
 func main() {
 
-	z80_cpu, err := z80_cpu.GetCPU("etc/snake.gb", "etc/opcodes.json")
+	z80_cpu, err := z80_cpu.GetCPU("system/etc/snake.gb", "system/etc/opcodes.json")
 	if err != nil {
 		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
 	}
