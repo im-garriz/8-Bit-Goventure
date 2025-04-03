@@ -14,7 +14,7 @@ func main() {
 		return
 	}
 
-	err = sys.StartCPU("system/etc/opcodes.json")
+	err = sys.StartCPU()
 	if err != nil {
 		fmt.Printf("Error loading CPU: %s\n", err)
 		return

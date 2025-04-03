@@ -16,17 +16,17 @@ type CPU struct {
 	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
 }
 
-func GetCPU(gameBoyCartridge *cartridge.GameBoyROM, opcodesJSONFile string) (*CPU, error) {
+func GetCPU(gameBoyCartridge *cartridge.GameBoyROM) (*CPU, error) {
 	cpu := CPU{}
-	err := cpu.Init(gameBoyCartridge, opcodesJSONFile)
+	err := cpu.Init(gameBoyCartridge)
 
 	return &cpu, err
 }
 
-func (cpu *CPU) Init(gameBoyCartridge *cartridge.GameBoyROM, opcodesJSONFile string) error {
+func (cpu *CPU) Init(gameBoyCartridge *cartridge.GameBoyROM) error {
 	cpu.Registers = GetCPURegisters()
 	cpu.Registers.Set16bitRegister("PC", 0x150)
-	dissassembler, err := disassembler.GetDissassembler(gameBoyCartridge, opcodesJSONFile)
+	dissassembler, err := disassembler.GetDissassembler(gameBoyCartridge)
 	if err != nil {
 		return err
 	}

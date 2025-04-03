@@ -21,9 +21,9 @@ func (system *GameBoySystem) LoadCartridge(cartridgeFile string) error {
 	return err
 }
 
-func (system *GameBoySystem) StartCPU(opcodesFile string) error {
+func (system *GameBoySystem) StartCPU() error {
 
-	cpu, err := z80_cpu.GetCPU(system.Cartridge, "system/etc/opcodes.json")
+	cpu, err := z80_cpu.GetCPU(system.Cartridge)
 	if err != nil {
 		return err
 	}
