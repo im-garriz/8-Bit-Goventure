@@ -3,6 +3,7 @@ package z80_cpu
 import (
 	"fmt"
 	"main/system/z80_cpu/disassembler"
+	"main/system/cartridge"
 
 	"github.com/golang-collections/collections/stack"
 )
@@ -15,24 +16,28 @@ type CPU struct {
 	Stack             stack.Stack // Stack.Push(a), a := Stack.Pop()
 }
 
-func GetCPU(cartridgeFile string, opcodesJSONFile string) (CPU, error) {
+func GetCPU(gameBoyCartridge *cartridge.GameBoyROM, opcodesJSONFile string) (*CPU, error) {
 	cpu := CPU{}
-	err := cpu.Init(cartridgeFile, opcodesJSONFile)
+	err := cpu.Init(gameBoyCartridge, opcodesJSONFile)
 
-	return cpu, err
+	return &cpu, err
 }
 
-func (cpu *CPU) Init(cartridgeFile string, opcodesJSONFile string) error {
+func (cpu *CPU) Init(gameBoyCartridge *cartridge.GameBoyROM, opcodesJSONFile string) error {
 	cpu.Registers = GetCPURegisters()
 	cpu.Registers.Set16bitRegister("PC", 0x150)
-	dec, err := disassembler.GetDissassembler(cartridgeFile, opcodesJSONFile)
+	dissassembler, err := disassembler.GetDissassembler(gameBoyCartridge, opcodesJSONFile)
 	if err != nil {
 		return err
 	}
-	cpu.Disassembler = dec
+
+	cpu.Disassembler = dissassembler
+
 	cpu.memory = initCPUMemory()
+
 	cpu.InterruptsEnabled = false
 	cpu.Stack = *stack.New()
+
 	return nil
 }
 

@@ -1,4 +1,4 @@
-package disassembler
+package cartridge
 
 import (
 	"encoding/binary"

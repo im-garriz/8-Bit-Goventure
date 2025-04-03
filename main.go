@@ -2,20 +2,42 @@ package main
 
 import (
 	"fmt"
-	"main/system/z80_cpu"
+	"main/system"
 )
 
 func main() {
+	sys := system.LoadSystem()
 
-	z80_cpu, err := z80_cpu.GetCPU("system/etc/snake.gb", "system/etc/opcodes.json")
+	err := sys.LoadCartridge("system/etc/snake.gb")
 	if err != nil {
-		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
+		fmt.Printf("Error loading cartridge: %s\n", err)
+		return
 	}
-	err = z80_cpu.Run()
+
+	err = sys.StartCPU("system/etc/opcodes.json")
+	if err != nil {
+		fmt.Printf("Error loading CPU: %s\n", err)
+		return
+	}
+
+	err = sys.CPU.Run()
 	if err != nil {
 		fmt.Printf("Error in cpu.Run:\n[E]: %s\n", err)
 	}
+	
 }
+
+// func main() {
+
+// 	z80_cpu, err := z80_cpu.GetCPU("system/etc/snake.gb", "system/etc/opcodes.json")
+// 	if err != nil {
+// 		fmt.Printf("Error in GetCPU:\n[E]: %s\n", err)
+// 	}
+// 	err = z80_cpu.Run()
+// 	if err != nil {
+// 		fmt.Printf("Error in cpu.Run:\n[E]: %s\n", err)
+// 	}
+// }
 
 // func main() {
 // 	instructions, err := opcodes.ReadOpcodes(false)

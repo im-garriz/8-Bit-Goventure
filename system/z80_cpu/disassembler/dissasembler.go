@@ -4,11 +4,13 @@ package disassembler
 import (
 	"encoding/binary"
 	"fmt"
+
+	"main/system/cartridge"
 )
 
 // Dissasembler represents a GameBoy ROM disassembler.
 type Disassembler struct {
-	Cartridge    *GameBoyROM   // GameBoy ROM to disassemble.
+	Cartridge    *cartridge.GameBoyROM   // GameBoy ROM to disassemble.
 	Address      uint16        // Current address in the disassembler.
 	Instructions *Instructions // Set of GameBoy assembly instructions.
 }
@@ -93,17 +95,17 @@ func (d *Disassembler) Decode(address uint16) (uint16, Instruction, error) {
 
 // GetDissassembler initializes a Dissasembler for the specified GameBoy ROM file and returns a pointer to it.
 // It takes the file path of the GameBoy ROM and returns a Dissasembler and an error, if any.
-func GetDissassembler(cartridgeFile string, opcodesJSONFile string) (*Disassembler, error) {
+func GetDissassembler(gameBoyCartridge *cartridge.GameBoyROM, opcodesJSONFile string) (*Disassembler, error) {
 	instructions, err := GetAssemblyInstructions(opcodesJSONFile)
 	if err != nil {
 		return nil, err
 	}
-	gameBoyRom, err := LoadROM(cartridgeFile)
-	if err != nil {
-		return nil, err
-	}
+	// gameBoyRom, err := LoadROM(cartridgeFile)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	dissasembler := Disassembler{Cartridge: gameBoyRom, Address: 0, Instructions: instructions}
+	dissasembler := Disassembler{Cartridge: gameBoyCartridge, Address: 0, Instructions: instructions}
 
 	return &dissasembler, nil
 }
